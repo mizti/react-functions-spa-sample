@@ -1,49 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
 import './App.css';
 
+// Custom components
+import NavBar from './components/NavBar';
+import PublicHome from './components/PublicHome';
+import PrivateHome from './components/PrivateHome';
+
 function App() {
-  const [name, setName] = React.useState('');
-  const [message, setMessage] = React.useState('');
-  console.log('name', name);
-  console.log('message', message);
 
-  const getDataFromApi = async (e: any) => {
-    e.preventDefault();
-    console.log("button pushed");
+  const [isAuthenticated, userHasAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
-    const response = await fetch(`/api/hello?name=${name}`);
-    console.log(response);
-    const json = await response.json();
-    console.log(json);
-    if (json.message) {
-      setMessage(json.message);
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
+  async function getUserInfo() {
+    try {
+
+      const response = await fetch('/.auth/me');
+      const payload = await response.json();
+      const { clientPrincipal } = payload;
+
+      if (clientPrincipal) {
+        setUser(clientPrincipal);
+        userHasAuthenticated(true);
+        console.log(`clientPrincipal = ${JSON.stringify(clientPrincipal)}`);
+      }
+
+    } catch (error: any) {
+      console.error('No profile could be found ' + error?.message?.toString());
     }
   };
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <form id="form1" className="App-form" onSubmit={e => getDataFromApi(e)}>
-          <div>
-            <input
-              type="text"
-              id="name"
-              className="App-input"
-              placeholder="Name"
-              value={name}
-              onChange={e => setName(e.target.value)} />
-            <button type="submit" className="App-button">Submit</button>
-          </div>
-        </form>
-        <div><h5>Message: {message} </h5></div>
-      </header>
+      <NavBar user={user} />
+      <main className="column">
+        {isAuthenticated ? <PrivateHome user={user} /> : <PublicHome />}
+      </main>
     </div>
-  );
+  )
 }
 
 export default App;
