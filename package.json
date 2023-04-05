@@ -1,0 +1,21 @@
+{
+  "name": "azure-webapp-spa-react-sample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start-api": "cd api && npm start",
+    "start-app": "cd app && npm start",
+    "start-dev": "concurrently \"npm:start-api\" \"npm:start-app\" ",
+    "start-swa": "swa start http://localhost:3000 --api-location http://localhost:7071",
+    "start": " npm run start-dev & npm run start-swa"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@azure/static-web-apps-cli": "^1.1.1",
+    "azure-functions-core-tools": "^4.0.5095",
+    "concurrently": "^8.0.1"
+  }
+}
